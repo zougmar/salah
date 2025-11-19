@@ -12,7 +12,7 @@ const createDefaultAdmin = async () => {
         name: 'Admin',
         username: 'admin',
         email: 'admin@manager.com',
-        password: 'admin123',
+        password: 'AdminSecure2023!',
         role: 'admin',
         position: 'System Administrator'
       });
@@ -24,7 +24,7 @@ const createDefaultAdmin = async () => {
       await admin.save();
       console.log('Default admin created successfully');
       console.log('Email: admin@manager.com');
-      console.log('Password: admin123');
+      console.log('Password: AdminSecure2023!');
     }
   } catch (error) {
     console.error('Error creating default admin:', error);

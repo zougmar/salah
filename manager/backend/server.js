@@ -8,6 +8,20 @@ import createDefaultAdmin from './config/defaultAdmin.js';
 // Load env vars
 dotenv.config();
 
+// Debug environment variables
+console.log('Environment variables loaded:');
+console.log('- JWT_SECRET:', process.env.JWT_SECRET ? 'exists' : 'missing');
+console.log('- MONGODB_URI:', process.env.MONGODB_URI ? 'exists' : 'missing');
+console.log('- PORT:', process.env.PORT || 'default');
+
+// Verify environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL ERROR: JWT_SECRET is not defined in the environment variables');
+  process.exit(1);
+}
+
+console.log('JWT_SECRET loaded successfully');
+
 // Connect to database
 connectDB();
 

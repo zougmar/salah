@@ -10,13 +10,22 @@ const userSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    required: true,
+    required: [true, 'Please provide a username'],
     unique: true,
+    trim: true,
+    minlength: [3, 'Username must be at least 3 characters'],
+    maxlength: [20, 'Username cannot be more than 20 characters'],
+    match: [
+      /^[a-zA-Z0-9_]+$/,
+      'Username can only contain letters, numbers, and underscores',
+    ],
   },
   email: {
     type: String,
     required: [true, 'Please provide an email'],
     unique: true,
+    lowercase: true,
+    trim: true,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       'Please add a valid email',
@@ -27,6 +36,13 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please provide a password'],
     minlength: [6, 'Password must be at least 6 characters'],
     select: false, // Don't return password by default
+    validate: {
+      validator: function(password) {
+        // Password must contain at least one uppercase letter, one lowercase letter, and one number
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password);
+      },
+      message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+    },
   },
   role: {
     type: String,

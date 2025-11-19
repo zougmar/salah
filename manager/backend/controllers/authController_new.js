@@ -61,8 +61,19 @@ const register = async (req, res) => {
       }
     );
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Registration error:', err);
+
+    // Handle specific errors
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(val => val.message);
+      return res.status(400).json({ msg: errors.join(', ') });
+    } else if (err.code === 11000) {
+      // Duplicate key error
+      const field = Object.keys(err.keyValue)[0];
+      return res.status(400).json({ msg: `${field} already exists` });
+    } else {
+      return res.status(500).json({ msg: 'Server error during registration' });
+    }
   }
 };
 
@@ -77,7 +88,7 @@ const login = async (req, res) => {
     }
 
     // Check for existing user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
@@ -95,6 +106,9 @@ const login = async (req, res) => {
       },
     };
 
+    // Log JWT_SECRET for debugging
+    console.log('JWT_SECRET in login:', process.env.JWT_SECRET ? 'exists' : 'missing');
+    
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
@@ -109,13 +123,14 @@ const login = async (req, res) => {
             id: user.id,
             name: user.name,
             email: user.email,
+            role: user.role,
           },
         });
       }
     );
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Login error:', err);
+    return res.status(500).json({ msg: 'Server error during login' });
   }
 };
 
@@ -133,8 +148,8 @@ const getProfile = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Get profile error:', err);
+    res.status(500).json({ msg: 'Server error while fetching profile' });
   }
 };
 
